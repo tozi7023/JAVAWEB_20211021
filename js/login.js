@@ -35,22 +35,26 @@ const check_input = () =>
         alert('비밀번호를 입력하세요.');
         return false;
     }
-    if (emailValue.length < 5) {
+    if (emailValue.length < 5) 
+    {
         alert('아이디는 최소 5글자 이상 입력해야 합니다.');
         return false;
     }
-    if (passwordValue.length < 12) {
+    if (passwordValue.length < 12) 
+    {
         alert('비밀번호는 반드시 12글자 이상 입력해야 합니다.');
         return false;
     }
     const hasSpecialChar = passwordValue.match(/[!,@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/) !== null;
-    if (!hasSpecialChar) {
+    if (!hasSpecialChar) 
+    {
         alert('패스워드는 특수문자를 1개 이상 포함해야 합니다.');
         return false;
-     }
+    }
     const hasUpperCase = passwordValue.match(/[A-Z]+/) !== null;
     const hasLowerCase = passwordValue.match(/[a-z]+/) !== null;
-    if (!hasUpperCase || !hasLowerCase) {
+    if (!hasUpperCase || !hasLowerCase) 
+    {
         alert('패스워드는 대소문자를 1개 이상 포함해야 합니다.');
         return false;
     }
@@ -59,11 +63,13 @@ const check_input = () =>
     // check_xss 함수로 비밀번호 Sanitize
     const sanitizedEmail = check_xss(emailValue);
     // check_xss 함수로 비밀번호 Sanitize
-    if (!sanitizedEmail) {
+    if (!sanitizedEmail) 
+    {
     // Sanitize된 비밀번호 사용
         return false;
     }
-    if (!sanitizedPassword) {
+    if (!sanitizedPassword) 
+    {
     // Sanitize된 비밀번호 사용
         return false;   
     }
@@ -104,6 +110,104 @@ const check_input = () =>
             }
         }
     }
+    /*
+    function session_set() 
+    { //세션 저장
+        let session_id = document.querySelector("#typeEmailX");
+        let session_pass = document.querySelector("#typePasswordX");
+        if (sessionStorage) 
+        {
+            let en_text = encrypt_text(session_pass.value);
+            sessionStorage.setItem("Session_Storage_id", session_id.value);
+            sessionStorage.setItem("Session_Storage_pass", en_text);
+        }
+        else 
+        {
+            alert("로컬 스토리지 지원 x");
+        }
+    }*/
+    function session_get() 
+    { //세션 읽기
+        if (sessionStorage)
+        {
+            return sessionStorage.getItem("Session_Storage_encrypted");
+        } 
+        else 
+        {
+            alert("세션 스토리지 지원 x");
+        }
+    }
+    function session_check() 
+    { //세션 검사
+        if (sessionStorage.getItem("Session_Storage_id")) 
+        {
+            alert("이미 로그인 되었습니다.");
+            location.href="../login/index_login.html"; // 로그인된 페이지로 이동
+        }
+    }
+    function encodeByAES256(key, data)
+    {
+        const cipher = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(key), 
+        {
+        iv: CryptoJS.enc.Utf8.parse(""),
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+        });
+        return cipher.toString();
+    }
+    function decodeByAES256(key, data)
+    {
+        const cipher = CryptoJS.AES.decrypt(data, CryptoJS.enc.Utf8.parse(key), 
+        {
+        iv: CryptoJS.enc.Utf8.parse(""),
+        padding: CryptoJS.pad.Pkcs7,
+        mode: CryptoJS.mode.CBC
+        });
+        return cipher.toString(CryptoJS.enc.Utf8);
+    }
+    function encrypt_text(password)
+    {
+        const k = "key"; // 클라이언트 키
+        const rk = k.padEnd(32, " "); // AES256은 key 길이가 32
+        const b = password;
+        const eb = this.encodeByAES256(rk, b);
+        return eb;
+        console.log(eb);
+    }
+    function decrypt_text()
+    {
+        const k = "key"; // 서버의 키
+        const rk = k.padEnd(32, " "); // AES256은 key 길이가 32
+        const eb = session_get();
+        const b = this.decodeByAES256(rk, eb);
+        console.log(b);
+    }
+    function init_logined()
+    {
+        if(sessionStorage)
+        {
+            decrypt_text(); // 복호화 함수
+        }
+        else
+        {
+            alert("세션 스토리지 지원 x");
+        }
+    }
+    function addJavascript(jsname) 
+    { // 자바스크립트 외부 연동
+        var th = document.getElementsByTagName('head')[0];
+        var s = document.createElement('script');
+        s.setAttribute('type','text/javascript');
+        s.setAttribute('src',jsname);
+        th.appendChild(s);
+    }
+    addJavascript('/js/security.js'); // 암복호화 함수
+    addJavascript('/js/session.js'); // 세션 함수
+    addJavascript('/js/cookie.js'); // 쿠키 함수
+    
+            
+            
+        
 };
 
 
